@@ -2,6 +2,7 @@ package com.example.application.views.gestioncontador;
 
 import com.example.application.data.sistema.Estado;
 import com.example.application.data.sistema.Promocion;
+import com.example.application.services.LogsService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -31,8 +32,11 @@ import java.util.List;
 public class GestionContadorView extends VerticalLayout {
 
     Grid<Promocion> gridPromocionesActivas = new Grid<Promocion>(Promocion.class,false);
+    List<Promocion> listaFicticia = new ArrayList<>();
+    LogsService servicioLogs;
 
-    public GestionContadorView() {
+    public GestionContadorView(LogsService servicioLogs) {
+        this.servicioLogs = servicioLogs;
         setSizeFull();
         getStyle().set("flex-grow", "1");
 
@@ -49,25 +53,33 @@ public class GestionContadorView extends VerticalLayout {
         H2 titulo = new H2("Crear Promoción");
         H2 titulo2 = new H2("Lista de Promociones");
 
+        DateTimePicker fechaInicio = new DateTimePicker("Fecha de inicio");
+        DateTimePicker fechaFin = new DateTimePicker("Fecha de fin");
 
         // Campos numérico
         HorizontalLayout layoutNumeros = new HorizontalLayout();
+
         NumberField montoInicial = new NumberField("Monto Inicial");
         montoInicial.setPrefixComponent(VaadinIcon.DOLLAR.create());
+
         NumberField factorConversion = new NumberField("Factor de Conversion");
-        Button botonCrear = new Button("Nueva Promo", event -> {});
+
+        Button botonCrear = new Button("Nueva Promo", event -> {
+            agregarPromocion(fechaInicio.getValue(),fechaFin.getValue(),montoInicial.getValue());
+        });
         botonCrear.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
         layoutNumeros.setWidth("100%");
         layoutNumeros.setAlignItems(Alignment.END);
         layoutNumeros.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        Div contenedor = new Div();
+
+        HorizontalLayout contenedor = new HorizontalLayout();
+
         contenedor.add(montoInicial,factorConversion);
         layoutNumeros.add(contenedor,botonCrear);
 
         // Campos de fecha
         HorizontalLayout layoutFechas = new HorizontalLayout();
-        DateTimePicker fechaInicio = new DateTimePicker("Fecha de inicio");
-        DateTimePicker fechaFin = new DateTimePicker("Fecha de fin");
         layoutFechas.add(fechaInicio,fechaFin);
 
 
@@ -98,6 +110,7 @@ public class GestionContadorView extends VerticalLayout {
             botonIniciar.addClickListener(e -> {
                 Notification notification = Notification.show("Promocion Iniciada!");
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+
             });
             botonDetener.addClickListener(e -> {
                 mostrarConfirmacion();
@@ -132,10 +145,15 @@ public class GestionContadorView extends VerticalLayout {
     }
 
     private void actualizarListaPromociones (){
-        List<Promocion> listaFicticia = new ArrayList<>();
+
         listaFicticia.add(new Promocion(LocalDateTime.now(),LocalDateTime.now(),300000d,new ArrayList<>(),0d, Estado.ENCURSO));
         listaFicticia.add(new Promocion(LocalDateTime.now(),LocalDateTime.now(),600000d,new ArrayList<>(),0d,Estado.ENCURSO));
         listaFicticia.add(new Promocion(LocalDateTime.now(),LocalDateTime.now(),500000d,new ArrayList<>(),0d,Estado.DETENIDA));
+        gridPromocionesActivas.setItems(listaFicticia);
+    }
+
+    private void agregarPromocion(LocalDateTime inicio, LocalDateTime fin, Double monto){
+        listaFicticia.add(new Promocion(inicio,fin,monto,new ArrayList<>(),0d, Estado.NOINICIADA));
         gridPromocionesActivas.setItems(listaFicticia);
     }
 }

@@ -5,6 +5,7 @@ import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
@@ -18,6 +19,7 @@ import de.mekaso.vaadin.addon.compani.effect.*;
 @AnonymousAllowed
 @PageTitle("Front")
 @Route(value = "front", autoLayout = false)
+@Menu(order = 2, icon = "line-awesome/svg/clock.svg")
 @StyleSheet(Animation.STYLES)
 public class FrontView extends FlexLayout{
 
