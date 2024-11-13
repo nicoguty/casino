@@ -7,15 +7,19 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -106,6 +110,7 @@ public class GestionContadorView extends VerticalLayout {
             HorizontalLayout botones = new HorizontalLayout();
             Button botonIniciar = new Button("Iniciar");
             Button botonDetener = new Button("Detener");
+            Button botonCambioFactor = new Button("Editar");
             Button botonImprimir = new Button("Detalle");
             botonIniciar.addClickListener(e -> {
                 Notification notification = Notification.show("Promocion Iniciada!");
@@ -115,10 +120,10 @@ public class GestionContadorView extends VerticalLayout {
             botonDetener.addClickListener(e -> {
                 mostrarConfirmacion();
             });
-            botonImprimir.addClickListener(e -> {
-
+            botonCambioFactor.addClickListener(e -> {
+                mostrarMenuEditar();
             });
-            botones.add(botonIniciar,botonDetener,botonImprimir);
+            botones.add(botonIniciar,botonDetener,botonCambioFactor,botonImprimir);
             return botones;
         }).setHeader("Acciones").setAutoWidth(true);
 
@@ -140,6 +145,34 @@ public class GestionContadorView extends VerticalLayout {
             Notification notification = Notification.show("Promocion Detenida!");
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         });
+
+        dialog.open();
+    }
+
+    private void mostrarMenuEditar (){
+
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Editar Factor de conversion.");
+
+        VerticalLayout dialogLayout = new VerticalLayout();
+        Paragraph titulo1 = new Paragraph("Factor:");
+        TextField factor = new TextField();
+        factor.setPrefixComponent(new Paragraph("%"));
+        Paragraph titulo2 = new Paragraph("Monto:");
+        TextField monto = new TextField();
+        monto.setPrefixComponent(new Paragraph("$"));
+        Paragraph titulo3 = new Paragraph("Puntos:");
+        TextField puntos = new TextField();
+        puntos.setPrefixComponent(new Paragraph("-"));
+
+        dialogLayout.add(titulo1,factor,titulo2,monto,titulo3,puntos);
+        dialog.add(dialogLayout);
+
+        Button saveButton = new Button("Guardar",e -> {});
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Button cancelButton = new Button("Cancel", e -> dialog.close());
+        dialog.getFooter().add(cancelButton);
+        dialog.getFooter().add(saveButton);
 
         dialog.open();
     }
