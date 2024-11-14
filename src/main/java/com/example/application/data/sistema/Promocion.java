@@ -18,11 +18,18 @@ public class Promocion extends AbstractEntity {
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaFin;
     private Double montoInicial;
+    private Double montoActual;
+    private Double montoFinal;
+    private Double ultimoValorContador;
+    private Boolean huboCambioFactor;
+
     @OneToMany
     private List<ItemsPromocion> listaItems;
-    private Double montoFinal;
+
     @Enumerated(EnumType.STRING)
     private Estado estado;
+    @Enumerated(EnumType.STRING)
+    private OrdenPromocion orden;
 
 
 }

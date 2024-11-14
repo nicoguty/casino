@@ -158,6 +158,7 @@ public class GestionContadorView extends VerticalLayout {
         Paragraph titulo1 = new Paragraph("Factor:");
         TextField factor = new TextField();
         factor.setPrefixComponent(new Paragraph("%"));
+
         Paragraph titulo2 = new Paragraph("Monto:");
         TextField monto = new TextField();
         monto.setPrefixComponent(new Paragraph("$"));

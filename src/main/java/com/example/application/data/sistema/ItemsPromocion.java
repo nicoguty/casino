@@ -18,4 +18,5 @@ public class ItemsPromocion extends AbstractEntity {
 
     private Double puntos;
     private Double factor;
+
 }
