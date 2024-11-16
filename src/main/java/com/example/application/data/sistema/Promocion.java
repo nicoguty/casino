@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,6 +21,7 @@ public class Promocion extends AbstractEntity {
     private Double montoInicial;
     private Double montoActual;
     private Double montoFinal;
+    private LocalDateTime ultimoCambioFactor;
     private Double ultimoValorContador;
     private Boolean huboCambioFactor;
 
@@ -32,4 +34,11 @@ public class Promocion extends AbstractEntity {
     private OrdenPromocion orden;
 
 
+    public Promocion(LocalDateTime fechaInicio, LocalDateTime fechaFin, Double montoInicial,Double montoFinal, Estado estado) {
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.montoInicial = montoInicial;
+        this.montoFinal=montoFinal;
+        this.estado = estado;
+    }
 }
