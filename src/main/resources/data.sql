@@ -4,7 +4,7 @@ insert into application_user (version, id, username,name,hashed_password,profile
 insert into user_roles (user_id, roles) values ('2', 'USER')
 insert into user_roles (user_id, roles) values ('2', 'ADMIN')
 
-INSERT INTO application_promos (version,id,fecha_inicio, fecha_fin, monto_inicial, estado, orden) VALUES (1,'1','2024-11-15 08:00:00', '2024-12-15 20:00:00', 100.0, 'NO_INICIADA', 'NONE')
+INSERT INTO application_promos (version,id,fecha_inicio, fecha_fin, monto_inicial,monto_final, estado, orden) VALUES (1,'1','2024-11-15 08:00:00', '2024-12-15 20:00:00', 100.0,0, 'NO_INICIADA', 'NONE')
 
 INSERT INTO contador (id, version,base_pts, created_dtm, description) VALUES ('1',0, 100, '2024-01-15 10:00:00', 'Juego 1')
 INSERT INTO contador (id, version,base_pts, created_dtm, description) VALUES ('2',0, 200, '2024-03-05 15:30:00', 'Promoción especial')

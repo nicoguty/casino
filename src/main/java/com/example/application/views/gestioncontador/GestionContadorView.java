@@ -1,6 +1,7 @@
 package com.example.application.views.gestioncontador;
 
 import com.example.application.data.sistema.Estado;
+import com.example.application.data.sistema.OrdenPromocion;
 import com.example.application.data.sistema.Promocion;
 import com.example.application.services.LogsService;
 import com.example.application.services.PromocionService;
@@ -17,9 +18,13 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.validator.DateTimeRangeValidator;
+import com.vaadin.flow.data.validator.DoubleRangeValidator;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -29,6 +34,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @PageTitle("Gestion de Promociones")
@@ -42,6 +48,7 @@ public class GestionContadorView extends VerticalLayout {
     private Double puntosNumero =0d;
     private Double montoNumero =0d;
     private Paragraph resultado = new Paragraph("Complete los campos para determinar el factor calculado.");
+    private Binder<Promocion> binder = new Binder<>(Promocion.class);
 
 
     private LogsService logsService;
@@ -59,10 +66,8 @@ public class GestionContadorView extends VerticalLayout {
         actualizarListaPromociones();
 
     }
-
     private void crearInterfazPrincipal() {
-
-        HorizontalLayout bloquePrincipal= new HorizontalLayout();
+        HorizontalLayout bloquePrincipal = new HorizontalLayout();
         bloquePrincipal.setAlignItems(Alignment.END);
 
         VerticalLayout columna1 = new VerticalLayout();
@@ -76,81 +81,70 @@ public class GestionContadorView extends VerticalLayout {
         H2 titulo2 = new H2("Lista de Promociones");
 
         DateTimePicker fechaInicio = new DateTimePicker("Fecha de inicio");
-        DateTimePicker fechaFin = new DateTimePicker("Fecha de finalizacion.");
+        DateTimePicker fechaFin = new DateTimePicker("Fecha de finalización");
+        NumberField factorConversion = new NumberField("Factor de Conversion");
 
-        // Campos numérico
+        // Campos numéricos
         HorizontalLayout layoutNumeros = new HorizontalLayout();
 
         NumberField montoInicial = new NumberField("Monto Inicial");
         montoInicial.setPrefixComponent(VaadinIcon.DOLLAR.create());
 
-        HorizontalLayout botonera1 = new HorizontalLayout();
-        HorizontalLayout botonera2 = new HorizontalLayout();
-
-        NumberField factorConversion = new NumberField("Factor de Conversion");
-        NumberField puntos = new NumberField("Puntos");
-        NumberField monto = new NumberField("Monto");
-
-
-        puntos.addValueChangeListener(event -> {
-            puntosNumero = event.getValue();
-            actualizarResultado();
-        });
-        monto.addValueChangeListener(event -> {
-            montoNumero = event.getValue();
-            actualizarResultado();
-        });
-
-        botonera2.setVisible(false);
-
-        RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
-        radioGroup.setLabel("Formato de calculo de puntos:");
-        radioGroup.setItems("Factor de conversion", "Puntos - Monto");
-        radioGroup.setValue("Factor de conversion");
-
-        radioGroup.addValueChangeListener(event -> {
-            if(event.getValue().equals("Factor de conversion")){
-                botonera1.setVisible(true);
-                botonera2.setVisible(false);
-            } else {
-                botonera1.setVisible(false);
-                botonera2.setVisible(true);
-            }
-        });
-
-        Button botonCrear = new Button("Nueva Promo", event -> {
-            agregarPromocion(fechaInicio.getValue(),fechaFin.getValue(),montoInicial.getValue());
-        });
+        Button botonCrear = new Button("Nueva Promo");
+        botonCrear.setEnabled(false); // Deshabilitado por defecto
         botonCrear.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         layoutNumeros.setWidth("100%");
         layoutNumeros.setAlignItems(Alignment.END);
         layoutNumeros.setJustifyContentMode(JustifyContentMode.BETWEEN);
 
-        botonera1.add(factorConversion);
-        botonera2.setAlignItems(Alignment.END);
-        botonera2.add(monto,puntos,resultado);
+        layoutNumeros.add(montoInicial, botonCrear);
 
-        layoutNumeros.add(botonera1,botonera2,botonCrear);
+        // Enlazar campos con el Binder
+        binder.forField(fechaInicio)
+                .withValidator(new DateTimeRangeValidator("La fecha de inicio es requerida", LocalDateTime.now(), LocalDateTime.now().plusMonths(2)))
+                .asRequired()
+                .bind(Promocion::getFechaInicio, Promocion::setFechaInicio);
 
-        // Campos de fecha
-        HorizontalLayout layoutFechas = new HorizontalLayout();
-        layoutFechas.add(fechaInicio,fechaFin,montoInicial);
+        binder.forField(fechaFin)
+                .withValidator(new DateTimeRangeValidator("La fecha de fin es requerida", LocalDateTime.now(), LocalDateTime.now().plusMonths(2)))
+                .asRequired()
+                .bind(Promocion::getFechaFin, Promocion::setFechaFin);
 
-        columna1.add(layoutFechas,radioGroup,layoutNumeros);
-        bloquePrincipal.add(columna1,columna2);
+        binder.forField(montoInicial)
+                .withValidator(new DoubleRangeValidator("El monto inicial debe ser mayor a 10 y menor a 1.000.000", 10D, 10000000D))
+                .asRequired()
+                .bind(Promocion::getMontoInicial, Promocion::setMontoInicial);
+
+        binder.forField(factorConversion)
+                .withValidator(new DoubleRangeValidator("El factor de conversion debe ser mayor a 0 y menor a 100", 0.01D, 50D))
+                .asRequired()
+                .bind(Promocion::getFactorConversion,Promocion::setFactorConversion);
+
+
+
+        // Escuchar cambios en los campos para habilitar/deshabilitar el botón
+        binder.addStatusChangeListener(event -> botonCrear.setEnabled(!event.hasValidationErrors()));
+
+        // Configuración del botón "Nueva Promo"
+        botonCrear.addClickListener(event -> {
+            Promocion promocion = new Promocion();
+            try {
+                binder.writeBean(promocion); // Transferir datos desde el formulario al objeto
+                agregarPromocion(promocion.getFechaInicio(), promocion.getFechaFin(), promocion.getMontoInicial());
+            } catch (ValidationException e) {
+                Notification.show("Error en el formulario: " + e.getMessage());
+            }
+        });
+
+        // Agregar elementos al diseño
+        HorizontalLayout layoutFechas = new HorizontalLayout(fechaInicio, fechaFin);
+        HorizontalLayout layoutCampos = new HorizontalLayout(montoInicial, factorConversion);
+        columna1.add(layoutFechas,layoutCampos, layoutNumeros);
+        bloquePrincipal.add(columna1, columna2);
         add(titulo, bloquePrincipal, titulo2, gridPromocionesActivas);
     }
 
-    private void actualizarResultado() {
-        String texto = "Factor calculado: ";
-        if(montoNumero != 0 & puntosNumero !=0) {
-            texto = texto.concat(String.valueOf(montoNumero / puntosNumero));
-        } else {
-            texto = "Ninguno de los campos puede ser cero.";
-        }
-        resultado.setText(texto);
-    }
 
 
     private void configurarGrid() {
@@ -160,16 +154,28 @@ public class GestionContadorView extends VerticalLayout {
         gridPromocionesActivas.addColumn(Promocion::getMontoInicial).setHeader("Monto Inicial");
         gridPromocionesActivas.addColumn(Promocion::getMontoFinal).setHeader("Monto Final");
         gridPromocionesActivas.addColumn(Promocion::getEstado).setHeader("Estado");
+        gridPromocionesActivas.addComponentColumn(promocion -> {
+            Select<OrdenPromocion> ordenPromocionSelect = new Select<>();
+            ordenPromocionSelect.setItems(OrdenPromocion.values());
+            return ordenPromocionSelect;
+        }).setHeader("Tipo Premio");
 
         gridPromocionesActivas.addComponentColumn(Promocion -> {
             HorizontalLayout botones = new HorizontalLayout();
             Button botonIniciar = new Button("Iniciar");
+            Button botonPausar = new Button("Pausar");
+            botonPausar.setEnabled(false);
             Button botonDetener = new Button("Detener");
+            botonDetener.setEnabled(false);
+            botonDetener.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
             Button botonCambioFactor = new Button("Editar");
-            Button botonImprimir = new Button("Detalle");
+            Button botonPremiar = new Button("Sacar Premio");
             botonIniciar.addClickListener(e -> {
                 Notification notification = Notification.show("Promocion Iniciada!");
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                botonIniciar.setEnabled(false);
+                botonPausar.setEnabled(true);
+                botonDetener.setEnabled(true);
 
             });
             botonDetener.addClickListener(e -> {
@@ -178,7 +184,7 @@ public class GestionContadorView extends VerticalLayout {
             botonCambioFactor.addClickListener(e -> {
                 mostrarMenuEditar();
             });
-            botones.add(botonIniciar,botonDetener,botonCambioFactor,botonImprimir);
+            botones.add(botonIniciar,botonPausar,botonCambioFactor,botonPremiar,botonDetener);
             return botones;
         }).setHeader("Acciones").setAutoWidth(true);
 
@@ -195,7 +201,9 @@ public class GestionContadorView extends VerticalLayout {
         dialog.setCancelable(true);
         dialog.addCancelListener(event -> {});
 
-        dialog.setConfirmText("Detener");
+        Button cancelButton = new Button("Detener");
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        dialog.setConfirmButton(cancelButton);
         dialog.addConfirmListener(event -> {
             Notification notification = Notification.show("Promocion Detenida!");
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);

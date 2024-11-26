@@ -23,6 +23,7 @@ public class Promocion extends AbstractEntity {
     private LocalDateTime ultimoCambioFactor;
     private Double ultimoValorContador;
     private Boolean huboCambioFactor;
+    private Double factorConversion;
 
     @OneToMany
     private List<ItemsPromocion> listaItems;
