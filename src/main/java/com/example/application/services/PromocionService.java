@@ -1,7 +1,6 @@
 package com.example.application.services;
 
-import com.example.application.data.User;
-import com.example.application.data.sistema.ContadorRepository;
+import com.example.application.data.contador.ContadorRepository;
 import com.example.application.data.sistema.ItemsPromocionRepository;
 import com.example.application.data.sistema.Promocion;
 import com.example.application.data.sistema.PromocionRepository;
@@ -10,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -47,6 +45,8 @@ public class PromocionService {
         // necesarios para actualizar monto de promo
 
 
+
+        
 
         return null;
     }

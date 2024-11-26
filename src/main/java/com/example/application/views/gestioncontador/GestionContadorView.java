@@ -241,7 +241,7 @@ public class GestionContadorView extends VerticalLayout {
     }
 
     private void agregarPromocion(LocalDateTime inicio, LocalDateTime fin, Double monto){
-        Promocion promoNueva = new Promocion(inicio, fin, monto, 0d, Estado.NOINICIADA);
+        Promocion promoNueva = new Promocion(inicio, fin, monto, 0d, Estado.NO_INICIADA);
         promocionService.update(promoNueva);
         actualizarListaPromociones();
     }
