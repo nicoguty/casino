@@ -2,6 +2,7 @@ package com.example.application.data.sistema;
 
 import com.example.application.data.AbstractEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,5 +19,8 @@ public class ItemsPromocion extends AbstractEntity {
 
     private Double puntos;
     private Double factor;
+
+    @ManyToOne(optional = false)
+    private Promocion promocion;
 
 }

@@ -1,10 +1,12 @@
 package com.example.application.views.gestioncontador;
 
+import com.example.application.broadcaster.BroadcasterActualizar;
 import com.example.application.data.sistema.Estado;
 import com.example.application.data.sistema.OrdenPromocion;
 import com.example.application.data.sistema.Promocion;
 import com.example.application.services.LogsService;
 import com.example.application.services.PromocionService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -28,6 +30,8 @@ import com.vaadin.flow.data.validator.DoubleRangeValidator;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -152,24 +156,42 @@ public class GestionContadorView extends VerticalLayout {
         gridPromocionesActivas.addColumn(Promocion::getFechaInicio).setHeader("Fecha Inicio");
         gridPromocionesActivas.addColumn(Promocion::getFechaFin).setHeader("Fecha Fin");
         gridPromocionesActivas.addColumn(Promocion::getMontoInicial).setHeader("Monto Inicial");
-        gridPromocionesActivas.addColumn(Promocion::getMontoFinal).setHeader("Monto Final");
+        gridPromocionesActivas.addColumn(Promocion::getMontoActual).setHeader("Monto Actual");
         gridPromocionesActivas.addColumn(Promocion::getEstado).setHeader("Estado");
         gridPromocionesActivas.addComponentColumn(promocion -> {
             Select<OrdenPromocion> ordenPromocionSelect = new Select<>();
             ordenPromocionSelect.setItems(OrdenPromocion.values());
+            ordenPromocionSelect.setValue(promocion.getOrden());
+            ordenPromocionSelect.addValueChangeListener(e -> {
+                ordenPromocionSelect.setValue(e.getValue());
+                promocion.setOrden(e.getValue());
+                promocionService.update(promocion);
+            });
+            ordenPromocionSelect.setWidthFull();
             return ordenPromocionSelect;
         }).setHeader("Tipo Premio");
 
-        gridPromocionesActivas.addComponentColumn(Promocion -> {
+        gridPromocionesActivas.addComponentColumn(promocion -> {
             HorizontalLayout botones = new HorizontalLayout();
             Button botonIniciar = new Button("Iniciar");
+
+            botonIniciar.addClickListener(e ->{
+                promocion.setEstado(Estado.EN_CURSO);
+                promocionService.update(promocion);
+            });
+
+
+
             Button botonPausar = new Button("Pausar");
+            botonPausar.addClickListener(e->{
+                promocion.setEstado(Estado.DETENIDA);
+                promocionService.update(promocion);
+            });
             botonPausar.setEnabled(false);
             Button botonDetener = new Button("Detener");
             botonDetener.setEnabled(false);
             botonDetener.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
             Button botonCambioFactor = new Button("Editar");
-            Button botonPremiar = new Button("Sacar Premio");
             botonIniciar.addClickListener(e -> {
                 Notification notification = Notification.show("Promocion Iniciada!");
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -184,7 +206,7 @@ public class GestionContadorView extends VerticalLayout {
             botonCambioFactor.addClickListener(e -> {
                 mostrarMenuEditar();
             });
-            botones.add(botonIniciar,botonPausar,botonCambioFactor,botonPremiar,botonDetener);
+            botones.add(botonIniciar,botonPausar,botonCambioFactor,botonDetener);
             return botones;
         }).setHeader("Acciones").setAutoWidth(true);
 
@@ -251,6 +273,21 @@ public class GestionContadorView extends VerticalLayout {
     private void agregarPromocion(LocalDateTime inicio, LocalDateTime fin, Double monto){
         Promocion promoNueva = new Promocion(inicio, fin, monto, 0d, Estado.NO_INICIADA);
         promocionService.update(promoNueva);
+        actualizarListaPromociones();
+    }
+
+    @PostConstruct
+    public void init() {
+        BroadcasterActualizar.register(UI.getCurrent(), this::actualizarGrid);
+    }
+
+    @PreDestroy
+    public void destroy() {
+        BroadcasterActualizar.unregister(UI.getCurrent());
+    }
+
+    private void actualizarGrid(Boolean message) {
+        // Actualiza el grid o realiza cualquier acción en la UI
         actualizarListaPromociones();
     }
 }

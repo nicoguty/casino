@@ -25,7 +25,7 @@ public class Promocion extends AbstractEntity {
     private Boolean huboCambioFactor;
     private Double factorConversion;
 
-    @OneToMany
+    @OneToMany (mappedBy = "promocion",fetch = FetchType.EAGER)
     private List<ItemsPromocion> listaItems;
 
     @Enumerated(EnumType.STRING)
