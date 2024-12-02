@@ -5,6 +5,8 @@ import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -25,8 +27,13 @@ public class FrontView extends FlexLayout{
 
     public FrontView() {
 
-        double numeroGuardado = 123.45; // Valor simulado; puedes reemplazarlo con el valor guardado real
+        double major = 1342223.45; // Valor simulado; puedes reemplazarlo con el valor guardado real
 
+        double grand = 1105000.22; // Valor simulado; puedes reemplazarlo con el valor guardado real
+
+        double minor = grand -200000; // Valor simulado; puedes reemplazarlo con el valor guardado real
+
+        double mini = minor - 60000; // Valor simulado; puedes reemplazarlo con el valor guardado real
         // Imagen de fondo
         StreamResource imageResource = new StreamResource("myimage.png",
                 () -> getClass().getResourceAsStream("/images/image.png"));
@@ -34,29 +41,102 @@ public class FrontView extends FlexLayout{
         backgroundImage.setSizeFull();
         backgroundImage.getStyle().set("position", "absolute").set("top", "0").set("left", "0").set("z-index", "-1");
 
-        // Número en el centro de la pantalla
-        Paragraph numeroTexto = new Paragraph(String.valueOf(numeroGuardado));
-        numeroTexto.getStyle().setFontSize("150px");
-        numeroTexto.getStyle().setColor("white");
-        numeroTexto.getStyle().setMarginRight("50px");
 
-        AnimationBuilder
+
+
+        // Número en el centro de la pantalla
+        VerticalLayout MajorLayout = new VerticalLayout();
+        // MajorLayout.setSizeFull();
+        Paragraph numeroTexto = new Paragraph("$" + String.valueOf(major));
+        numeroTexto.addClassName("major");
+        numeroTexto.getStyle().setFontSize("150px");
+        numeroTexto.getStyle().setFontWeight("900");
+
+        numeroTexto.getStyle().setColor("white");
+        numeroTexto.getStyle().setMarginTop("4.05rem");
+        MajorLayout.setAlignItems(Alignment.CENTER);
+
+      /*  AnimationBuilder
                 .createBuilderFor(numeroTexto)
                 .create(AnimationTypes.TextAnimation.class)
-                .withEffect(TextDisplayEffect.Snake)
-                .start();
+                .withEffect(TextDisplayEffect.JoltZoom)
+                .start();*/
+        MajorLayout.add(numeroTexto);
 
+        VerticalLayout GrandLayout = new VerticalLayout();
+        //GrandLayout.setSizeFull();
+        Paragraph numeroTexto1 = new Paragraph("$" + String.valueOf(grand));
+        numeroTexto1.addClassName("grand");
+        numeroTexto1.getStyle().setFontSize("110px");
+        numeroTexto1.getStyle().setFontWeight("900");
+
+        numeroTexto1.getStyle().setColor("white");
+        numeroTexto1.getStyle().setMarginTop("-2.0rem");
+
+
+        GrandLayout.add(numeroTexto1);
+       /* AnimationBuilder
+                .createBuilderFor(numeroTexto1)
+                .create(AnimationTypes.TextAnimation.class)
+                .withEffect(TextDisplayEffect.JoltZoom)
+                .start();*/
         // Estilos del layout
-        setSizeFull();
+        // setSizeFull();
         setAlignItems(Alignment.CENTER);
-        setJustifyContentMode(JustifyContentMode.END);
+        GrandLayout.setAlignItems(Alignment.CENTER);
+
+
+        HorizontalLayout MM = new HorizontalLayout();
+        //GrandLayout.setSizeFull();
+        Paragraph numeroTexto3 = new Paragraph("$" + String.valueOf(minor));
+        numeroTexto3.addClassName("minor");
+        numeroTexto3.getStyle().setFontSize("110px");
+        numeroTexto3.getStyle().setFontWeight("900");
+
+        numeroTexto3.getStyle().setColor("white");
+        numeroTexto3.getStyle().setMarginRight("50px");
+        numeroTexto3.getStyle().setPaddingLeft("0.5rem");
+        numeroTexto3.getStyle().setPaddingTop("3.0rem");
+
+        GrandLayout.add(numeroTexto1);
+        /*AnimationBuilder
+                .createBuilderFor(numeroTexto1)
+                .create(AnimationTypes.TextAnimation.class)
+                .withEffect(TextDisplayEffect.JoltZoom)
+                .start();*/
+        // Estilos del layout
+        // setSizeFull();
+
+        Paragraph numeroTexto4 = new Paragraph("$" + String.valueOf(mini));
+        numeroTexto4.addClassName("mini");
+        numeroTexto4.getStyle().setFontSize("110px");
+        numeroTexto4.getStyle().setFontWeight("900");
+        numeroTexto4.getStyle().setColor("white");
+        numeroTexto4.getStyle().setPaddingRight("0.5rem");
+        numeroTexto4.getStyle().setPaddingTop("3.0rem");
+
+
+      /*  AnimationBuilder
+                .createBuilderFor(numeroTexto1)
+                .create(AnimationTypes.TextAnimation.class)
+                .withEffect(TextDisplayEffect.JoltZoom)
+                .start();*/
+        // Estilos del layout
+        // setSizeFull();
+
+        MM.setJustifyContentMode(JustifyContentMode.EVENLY);
+        MM.add(numeroTexto3,numeroTexto4);
+        setAlignItems(Alignment.CENTER);
+        //setJustifyContentMode(JustifyContentMode.END);
         getStyle()
                 .set("position", "relative")
                 .set("background-image", "url('/images/image.png')")
                 .set("background-size", "cover")
                 .set("background-position", "center");
 
+
+
         // Añadir los componentes al layout
-        add(backgroundImage, numeroTexto);
+        add(backgroundImage, MajorLayout,GrandLayout,MM);
     }
 }
